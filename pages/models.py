@@ -96,8 +96,6 @@ def ModelsScreen(page):
                 dist = getattr(stats, seleccion)
                 # Calcular y guardar los parámetros del modelo seleccionado
                 page.best_model_params = dist.fit(data)
-                print(f"Modelo actualizado: {seleccion}")
-                print(f"Parámetros actualizados: {page.best_model_params}")
             except Exception as ex:
                 print(f"Error al actualizar parámetros: {ex}")
                 # En caso de error, asegurarse de que haya un valor para best_model_params
