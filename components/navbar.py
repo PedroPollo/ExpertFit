@@ -6,10 +6,10 @@ def NavigationBar(page):
     nav_bar =  ft.NavigationBar(
         selected_index=selected_index,
         destinations = [
-            ft.NavigationBarDestination(icon=ft.Icons.DATA_THRESHOLDING_ROUNDED, label="Data"),
-            ft.NavigationBarDestination(icon=ft.Icons.MODEL_TRAINING_ROUNDED, label="Models"),
-            ft.NavigationBarDestination(icon=ft.Icons.AUTO_GRAPH_ROUNDED, label="Comparaciones"),
-            ft.NavigationBarDestination(icon=ft.Icons.SETTINGS_APPLICATIONS_ROUNDED, label="Aplicacion"),
+            ft.NavigationDestination(icon=ft.icons.DATA_THRESHOLDING_ROUNDED, label="Data"),
+            ft.NavigationDestination(icon=ft.icons.MODEL_TRAINING_ROUNDED, label="Models"),
+            ft.NavigationDestination(icon=ft.icons.AUTO_GRAPH_ROUNDED, label="Comparaciones"),
+            ft.NavigationDestination(icon=ft.icons.SETTINGS_APPLICATIONS_ROUNDED, label="Aplicacion"),
         ],
         on_change=lambda e: change_page(e, page, nav_bar)
     )

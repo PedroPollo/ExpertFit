@@ -53,6 +53,7 @@ def DataLoadedScreen(page):
 
     file_picker = ft.FilePicker(on_result=cargar_csv)
     page.overlay.append(file_picker)
+    page.update()
 
     cargar_btn = ft.ElevatedButton(
         "Seleccionar archivo CSV",

@@ -52,7 +52,7 @@ def ModelsScreen(page):
         value="", 
         size=18, 
         weight="bold", 
-        color=ft.Colors.GREEN,
+        color=ft.colors.GREEN,
         text_align=ft.TextAlign.CENTER,
         selectable=True
     )
@@ -71,7 +71,7 @@ def ModelsScreen(page):
     resultados_generales = ft.Text(
         value="", 
         size=16,
-        color=ft.Colors.BLUE,
+        color=ft.colors.BLUE,
         selectable=True
     )
     
