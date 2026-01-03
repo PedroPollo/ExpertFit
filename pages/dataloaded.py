@@ -1,23 +1,19 @@
-import flet as ft # type: ignore
-import pandas as pd # type: ignore
-import warnings
-from components import navbar, appbar
-
-warnings.filterwarnings("ignore", category=DeprecationWarning)
+import io
+import pandas as pd
+import flet as ft
 
 def DataLoadedScreen(page):
 
     infotxt = ft.Text()
     table_container = ft.Column()
 
-    # Botón que solo se activa al cargar datos
     continuar_btn = ft.ElevatedButton(
         "Continuar",
         disabled=True,
-        on_click=lambda e: page.go("/data"),  # Puedes cambiar la ruta
+        on_click=lambda e: page.go("/data"),
     )
 
-    def cargar_tabla_desde_df(df, file_path=None):
+    def cargar_tabla_desde_df(df, file_name=None):
         table = ft.DataTable(
             columns=[ft.DataColumn(ft.Text(col)) for col in df.columns],
             rows=[
@@ -31,25 +27,44 @@ def DataLoadedScreen(page):
         table_container.controls.clear()
         table_container.controls.append(table)
         continuar_btn.disabled = False
-        infotxt.value = f"Archivo cargado: {file_path}" if file_path else "Datos previamente cargados"
+        infotxt.value = f"Archivo cargado: {file_name}" if file_name else "Datos previamente cargados"
         page.update()
 
     def cargar_csv(e: ft.FilePickerResultEvent):
-        if e.files:
-            file_path = e.files[0].path
-            try:
-                df = pd.read_csv(file_path)
-                page.dataframe = df
-                cargar_tabla_desde_df(df, file_path)
+        if not e.files:
+            return
 
-            except Exception as ex:
+        f = e.files[0]
+        try:
+            # ✅ Verificamos que sea CSV
+            if not f.name.endswith(".csv"):
+                infotxt.value = "Error: Solo se permiten archivos CSV"
                 continuar_btn.disabled = True
-                infotxt.value = f"Error al cargar CSV: {ex}"
                 page.update()
+                return
 
-    # Verificar si ya hay un dataframe previamente cargado
-    if hasattr(page, "dataframe") and page.dataframe is not None:
-        cargar_tabla_desde_df(page.dataframe)
+            df = None
+
+            # ✅ Caso escritorio (tiene path real)
+            if hasattr(f, "path") and f.path:
+                df = pd.read_csv(f.path)
+
+            # ✅ Caso web (usa contenido en memoria)
+            elif hasattr(f, "content") and f.content:
+                df = pd.read_csv(io.BytesIO(f.content))
+
+            # ✅ Si no se pudo leer
+            if df is None:
+                raise ValueError("El archivo no tiene ni 'path' ni 'content' válidos")
+
+            # Guardamos el dataframe en la página
+            page.dataframe = df
+            cargar_tabla_desde_df(df, f.name)
+
+        except Exception as ex:
+            continuar_btn.disabled = True
+            infotxt.value = f"Error al cargar CSV: {ex}"
+            page.update()
 
     file_picker = ft.FilePicker(on_result=cargar_csv)
     page.overlay.append(file_picker)
@@ -60,23 +75,26 @@ def DataLoadedScreen(page):
         on_click=lambda _: file_picker.pick_files(
             allow_multiple=False,
             file_type=ft.FilePickerFileType.CUSTOM,
-            allowed_extensions=["csv"]
+            allowed_extensions=["csv"]  # ✅ Solo CSV
         )
     )
+
+    if hasattr(page, "dataframe") and page.dataframe is not None:
+        cargar_tabla_desde_df(page.dataframe)
 
     return ft.View(
         "/dataloaded",
         controls=[
-            appbar.appBar(page, "Cargar Datos"),
+            ft.AppBar(title=ft.Text("Cargar Datos")),
             ft.Container(
                 expand=True,
                 content=ft.Column(
                     [
                         ft.TextField(label="Nombre del proyecto"),
                         ft.ElevatedButton(
-                            "Volver", 
+                            "Volver",
                             on_click=lambda e: (setattr(page, "dataframe", None), page.go("/"))
-                            ),
+                        ),
                         cargar_btn,
                         infotxt,
                         table_container,

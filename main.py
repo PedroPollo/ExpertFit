@@ -1,4 +1,4 @@
-import flet as ft # type: ignore
+import flet as ft
 from pages import home, dataloaded, applications, comparisons, data, models
 
 
@@ -25,4 +25,6 @@ def main(page: ft.Page):
     page.go("/")
 
 
-ft.app(main)
+ft.app(
+    target=main
+)
